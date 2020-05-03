@@ -1,0 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playball&display=swap');
+
+*, *:before, *:after {
+    box-sizing: border-box;
+  }
+    
+body {
+    background-color: #93073E;
+    background-image: url('../img/twitter-icon.png');
+    background-repeat: no-repeat;
+    background-size: 65%;
+    background-position: 50% 15vh;
+}
+
+/* Title */
+
+.title{
+    margin: 50px auto;
+}
+
+.game-title-1{
+    font: 3.5em sans-serif;
+    font-family: 'Bangers', cursive;
+    text-align: center;
+    color: #00AAEC;
+    text-shadow: 1px 1px 0 #93073E, 3px 3px 0 white;
+    font-weight: 900;
+    margin: 0;
+}
+
+.game-title-2{
+    font: 1.5em sans-serif;
+    font-family: 'Playball', cursive;
+    text-align: center;
+    color: white;
+    font-weight: 900;
+    margin: 0;
+}
+
+/* Status */
+.game-status {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    margin: 0 0 10px 10px;
+}
+
+.game-status .status {
+    margin-top: 5px;
+}
+
+.game-status .status label{
+    font: 1.5em sans-serif;
+    font-family: 'Playball', cursive;
+    color: white;
+}
+
+.game-status .status span{
+    font: 1.5em sans-serif;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    color: white;
+    border: solid 1px;
+    border-radius: 5px;
+
+    display: block;
+    float: left;
+    width: 50px;
+    margin-right: 25px;
+    text-align: center;
+}
+
+/* Cards */
+.card-style {
+    background-color: #FFC400;
+    color: #FF5627;
+    font-size: 1.5em;
+    font-weight: bold;
+    font-family: Arial, Helvetica, sans-serif;
+}
+  
+.game {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.cards {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0 2%;
+    height: 250px;
+}
+
+.card {
+    font: 2em sans-serif;
+    font-family: 'Bangers', cursive;
+
+    height: 50%;
+    margin: 5px;
+    position: relative;
+
+    flex-grow: 1;
+    flex-basis: 100px;
+}
+
+@media (max-width: 800px) {
+    body {
+        background-size: 90% auto;
+        background-position: 50% 20vh;
+    }
+}
