@@ -6,11 +6,15 @@ import Game from './Game'
 function App() {
   const [gameId, setGameId] = useState(1)
 
+  const startNewGame = () => setGameId(gameId + 1);
+  const values = ['A', 'B', 'C'];
+
   return (
     <div>
       <Game
         key={gameId}
-        startNewGame={() => setGameId(gameId + 1)}
+        startNewGame={startNewGame}
+        values={values}
       />
     </div>
   );

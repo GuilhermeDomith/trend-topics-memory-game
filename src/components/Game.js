@@ -1,19 +1,26 @@
 import React, { useState } from 'react';
 
-const Cards = (props) => {
+const Cards = ({ values, onCardClick }) => {
     return (
         <div className="cards">
-            {props.values.map((value, id) =>
-                <Card key={id} element={{ id, value }} onCardClick={props.onCardClick} />
+            {values.map((value, id) =>
+                <Card key={id} card={{ id, value }} onCardClick={onCardClick} />
             )}
         </div>
     )
 }
 
-const Card = (props) => {
+const Card = ({ onCardClick, card }) => {
+    const [isHidden, setIsHidden] = useState(false)
+
+    card.hidden = () => setIsHidden(true)
+
     return (
-        <button className="card card-style" onClick={() => props.onCardClick(props.element)} >
-            {props.element.value}
+        <button
+            hidden={isHidden}
+            className="card card-style"
+            onClick={(event) => onCardClick(card)} >
+            {card.value}
         </button>
     )
 }
@@ -27,65 +34,74 @@ const GameTitle = (props) => {
     )
 }
 
-const GameStatus = (props) => {
-    const selected = (props.selected) ? props.selected.value : '-';
+const Status = ({ label, value }) => {
     return (
-        <div className="game-status">
-            <div className="status card-selected">
-                <span>{selected}</span>
-                <label>Selecionado</label>
-            </div>
-            <div className="status game-hits">
-                <span>{props.hits}</span>
-                <label>Pontos</label>
-            </div>
+        <div className="status">
+            <span>{value}</span>
+            <label>{label}</label>
         </div>
     )
 }
 
-const ScrenRestartGame = (props) => {
+const GameStatus = ({ selected, hits }) => {
     return (
-        <button onClick={() => props.startNewGame()}>Reiniciar</button>
+        <div className="game-status">
+            <Status label="Selecionado" value={(selected) ? selected.value : '-'} />
+            <Status label="Pontos" value={hits} />
+        </div>
     )
 }
 
-export default function Game(props) {
-    const [values] = useState(["A", "B", "C", "C", "B", "A"]);
+const ScrenRestartGame = ({ startNewGame }) => {
+    return (
+        <button
+            onClick={() => startNewGame()}>
+            Reiniciar
+        </button>
+    )
+}
+
+export default function Game({ startNewGame, values }) {
+    const [cards] = useState(Utils.ramdomArray(Utils.doubleArray(values)));
     const [selected, setSelected] = useState(null);
     const [hits, setHits] = useState(0);
-    const [gameStatus, setGameStatus] = useState('active');
 
-    const isFirstCardSelected = () => selected === null;
-    const isCorrectElem = (elem) => elem.value === selected.value && elem.id !== selected.id;
-    const isGameFinished = () => hits === values.length
+    const areCardsMatch = (card) => card.value === selected.value && card.id !== selected.id;
+    const isFirstPair = selected === null;
+    const gameStatus = (hits === values.length) ? 'finished' : 'active';
 
-    const onCardClick = (elem) => {
+    const onCardClick = (card) => {
 
-        if (isFirstCardSelected()) {
-            setSelected(elem);
+        if (isFirstPair) {
+            setSelected(card);
         } else {
-            if (isCorrectElem(elem))
-                setHits(hits + 2);
+            if (areCardsMatch(card)) {
+                setHits(hits + 1);
+                card.hidden();
+                selected.hidden();
+            }
 
             setSelected(null)
         }
     }
 
-    if (isGameFinished())
-        setGameStatus('finished')
-
     return (
         <div className="game">
             <div>
-                <GameTitle show1="Trend Topics" show2="Memory Game" />
+                <GameTitle show1="Trending Topics" show2="Memory Game" />
             </div>
             <div>
                 {gameStatus === 'active' ?
-                    (<Cards values={values} onCardClick={onCardClick} />) :
-                    (<ScrenRestartGame {...props} />)
+                    (<Cards values={cards} onCardClick={onCardClick} />) :
+                    (<ScrenRestartGame startNewGame={startNewGame} />)
                 }
             </div>
             <GameStatus selected={selected} hits={hits} />
         </div>
     )
+}
+
+const Utils = {
+    ramdomArray: (array) => array.sort(() => 0.5 - Math.random()),
+    doubleArray: (array) => [...array, ...array],
 }
