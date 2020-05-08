@@ -1,89 +1,65 @@
 import React, { useState } from 'react';
+import Utils from '../utils';
+import Cards from './Cards';
+import GameTitle from './GameTitle';
+import FooterStatus from './FooterStatus';
+import ScrenRestartGame from './ScreenRestartGame';
 
-const Cards = ({ values, onCardClick }) => {
-    return (
-        <div className="cards">
-            {values.map((value, id) =>
-                <Card key={id} card={{ id, value }} onCardClick={onCardClick} />
-            )}
-        </div>
-    )
+
+const generateCardsByValues = (values) => {
+    const cardValues = Utils.shuffleArray(Utils.duplicateArray(values))
+
+    let cards = cardValues.map((elem, index) => ({
+        id: index,
+        value: elem,
+        isHidden: false
+    }));
+
+    return cards;
 }
 
-const Card = ({ onCardClick, card }) => {
-    const [isHidden, setIsHidden] = useState(false)
 
-    card.hidden = () => setIsHidden(true)
-
-    return (
-        <button
-            hidden={isHidden}
-            className="card card-style"
-            onClick={(event) => onCardClick(card)} >
-            {card.value}
-        </button>
-    )
-}
-
-const GameTitle = (props) => {
-    return (
-        <div className="title">
-            <h1 className="game-title-1">{props.show1}</h1>
-            <h2 className="game-title-2">{props.show2}</h2>
-        </div>
-    )
-}
-
-const Status = ({ label, value }) => {
-    return (
-        <div className="status">
-            <span>{value}</span>
-            <label>{label}</label>
-        </div>
-    )
-}
-
-const GameStatus = ({ selected, hits }) => {
-    return (
-        <div className="game-status">
-            <Status label="Selecionado" value={(selected) ? selected.value : '-'} />
-            <Status label="Pontos" value={hits} />
-        </div>
-    )
-}
-
-const ScrenRestartGame = ({ startNewGame }) => {
-    return (
-        <button
-            onClick={() => startNewGame()}>
-            Reiniciar
-        </button>
-    )
-}
-
-export default function Game({ startNewGame, values }) {
-    const [cards] = useState(Utils.ramdomArray(Utils.doubleArray(values)));
-    const [selected, setSelected] = useState(null);
+const useGameState = ({ values }) => {
+    const [cards] = useState(generateCardsByValues(values));
+    const [flipped, setFlipped] = useState(null);
     const [hits, setHits] = useState(0);
 
-    const areCardsMatch = (card) => card.value === selected.value && card.id !== selected.id;
-    const isFirstPair = selected === null;
+    const flippedCardsMatch = (card) => card.value === flipped.value && card.id !== flipped.id;
+    const isFirstPairFlipped = flipped === null;
     const gameStatus = (hits === values.length) ? 'finished' : 'active';
 
-    const onCardClick = (card) => {
 
-        if (isFirstPair) {
-            setSelected(card);
-        } else {
-            if (areCardsMatch(card)) {
-                setHits(hits + 1);
-                card.hidden();
-                selected.hidden();
-            }
-
-            setSelected(null)
+    const cardClicked = (card) => {
+        if (isFirstPairFlipped) {
+            setFlipped(card);
+            return;
         }
+
+        if (flippedCardsMatch(card)) {
+            card.isHidden = true;
+            flipped.isHidden = true;
+            setHits(hits + 1);
+        }
+
+        setFlipped(null)
     }
+
+
+    cards.forEach(card => {
+        card.click = () => cardClicked(card);
+    });
+
+    return { cards, flippedCard: flipped, hits, gameStatus }
+}
+
+
+const Game = ({ startNewGame, values }) => {
+    const {
+        cards,
+        flippedCard,
+        hits,
+        gameStatus
+    } = useGameState({ values });
 
     return (
         <div className="game">
@@ -92,16 +68,14 @@ export default function Game({ startNewGame, values }) {
             </div>
             <div>
                 {gameStatus === 'active' ?
-                    (<Cards values={cards} onCardClick={onCardClick} />) :
+                    (<Cards cards={cards} />) :
                     (<ScrenRestartGame startNewGame={startNewGame} />)
                 }
             </div>
-            <GameStatus selected={selected} hits={hits} />
+            <FooterStatus flippedCard={flippedCard} hits={hits} />
         </div>
     )
 }
 
-const Utils = {
-    ramdomArray: (array) => array.sort(() => 0.5 - Math.random()),
-    doubleArray: (array) => [...array, ...array],
-}
+
+export default Game;
